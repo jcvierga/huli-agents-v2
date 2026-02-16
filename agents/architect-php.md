@@ -43,10 +43,58 @@ Implementation plan saved to `.workflow/PLAN.md` with:
 
 ## Process
 
-1. **Read CLAUDE.md** - Understand project conventions
-2. **Find similar controllers** - Identify patterns to follow
-3. **Check existing models** - Reuse when possible
-4. **Map the implementation** - List files and changes
+### Step 1: Read Project Conventions
+```bash
+cat CLAUDE.md | head -100
+```
+
+### Step 2: Codebase Analysis (CRITICAL)
+
+**Before designing anything, analyze what already exists:**
+
+#### 2.1 Check Existing Controllers
+```bash
+ls src/Controller/
+grep -r "class.*Controller" src/Controller/
+```
+
+#### 2.2 Check Existing Services
+```bash
+ls src/Service/
+grep -r "class.*Service" src/Service/
+```
+
+#### 2.3 Check Existing Repositories
+```bash
+ls src/Repository/
+grep -r "findBy\|getBy" src/Repository/
+```
+
+#### 2.4 Find Similar Implementations
+```bash
+# Find controllers doing similar work
+grep -r "getHistory\|getPatient" src/Controller/
+```
+
+#### 2.5 Check Routes
+```bash
+# Find existing route definitions
+grep -r "GET\|POST" config/routes.php
+```
+
+### Step 3: Document Reusability Analysis
+
+| What Exists | Location | Can Reuse? | Notes |
+|-------------|----------|------------|-------|
+| BaseController | `src/Controller/BaseController.php` | ✅ | Extend |
+| ValidationService | `src/Service/ValidationService.php` | ✅ | Input validation |
+
+### Step 4: Design Implementation
+
+Only now design, preferring:
+- **Extend existing controllers** if in same domain
+- **Reuse services** over creating new ones
+- **Follow existing patterns** exactly
 
 ## Patterns You Know
 
@@ -130,8 +178,11 @@ class VitalSignsRepository
 
 ## Rules
 
-1. **Always check existing controllers first**
-2. **Follow MVC pattern strictly**
-3. **Include PHPUnit tests**
-4. **Use dependency injection**
-5. **Validate all inputs**
+1. **ALWAYS analyze codebase BEFORE designing** - Check what exists
+2. **REUSE over recreate** - Existing services, repositories, helpers
+3. **Follow MVC pattern strictly** - Controller → Service → Repository
+4. **Follow existing patterns** - Don't invent new patterns
+5. **Include reference files** - Show what to base new code on
+6. **Include PHPUnit tests** - Follow existing test patterns
+7. **Use dependency injection** - Constructor injection preferred
+8. **Validate all inputs** - Use existing validation patterns

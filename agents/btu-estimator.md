@@ -104,3 +104,5 @@ When you see a FE requirement, ASK:
 5. Group related work per repo
 6. Assign points and dependencies
 7. Output the task table
+
+**Note:** Architects will perform detailed codebase analysis to identify reusable code, existing patterns, and verify what already exists before implementation.

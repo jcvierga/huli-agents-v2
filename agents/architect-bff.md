@@ -41,10 +41,56 @@ Or inferred when:
 ## Output
 
 Implementation plan with:
+- **Existing endpoint analysis** (avoid duplicates)
 - Endpoint design
 - Services to aggregate
 - Response shape
 - Error handling strategy
+
+## Process
+
+### Step 1: Codebase Analysis (CRITICAL)
+
+**Before designing ANY new endpoint, check what exists:**
+
+#### 1.1 Check Existing Endpoints
+```bash
+# Find existing handlers
+ls handler/
+grep -r "func.*Get\|func.*List" handler/
+```
+
+#### 1.2 Check Existing Client Integrations
+```bash
+# Find which services are already integrated
+grep -r "ehrClient\|appointmentClient" handler/
+```
+
+#### 1.3 Check Existing Proto Definitions
+```bash
+# Find existing response types
+grep -r "message.*Response" proto/
+```
+
+#### 1.4 Find Similar Patterns
+```bash
+# Find handlers doing similar aggregation
+grep -r "sync.WaitGroup\|errgroup" handler/
+```
+
+### Step 2: Document Reusability
+
+| What Exists | Location | Can Reuse? |
+|-------------|----------|------------|
+| EHR client | `client/ehr.go` | ✅ |
+| Patient endpoint | `handler/patient.go` | ⚠️ Check if can extend |
+
+### Step 3: Verify if BFF is Needed
+
+**Ask yourself:**
+- Can FE call ehr directly? → No BFF needed
+- Does FE need data from 2+ services? → BFF aggregation
+- Does FE need different response shape? → BFF proxy
 
 ## When BFF is Needed
 
@@ -164,9 +210,12 @@ func (h *Handler) GetVitalSignsHistory(ctx context.Context, req *GetVitalSignsHi
 
 ## Rules
 
-1. **Aggregate when FE needs multiple services**
-2. **Proxy when FE needs different response shape**
-3. **Parallelize independent service calls**
-4. **Handle partial failures gracefully**
-5. **Cache when appropriate** (short TTL for dynamic data)
-6. **Don't duplicate business logic** - Keep in microservices
+1. **ALWAYS check existing endpoints FIRST** - Don't create duplicates
+2. **Verify BFF is needed** - Maybe FE can call service directly
+3. **REUSE existing clients** - Don't recreate service integrations
+4. **Aggregate when FE needs multiple services**
+5. **Proxy when FE needs different response shape**
+6. **Parallelize independent service calls**
+7. **Handle partial failures gracefully**
+8. **Cache when appropriate** (short TTL for dynamic data)
+9. **Don't duplicate business logic** - Keep in microservices
