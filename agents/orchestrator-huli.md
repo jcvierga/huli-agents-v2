@@ -69,7 +69,10 @@ Get BTU from user (link or pasted content)
 Use Task tool with subagent_type: btu-estimator
 ```
 
-Get back task list with points.
+The estimator will:
+- Analyze requirements
+- **Infer hidden work** (APIs, DB, queues)
+- Return tasks across ALL affected repos
 
 ### Step 3: Route to Architects
 
@@ -142,8 +145,19 @@ Task(subagent_type: "architect-php", prompt: "Plan: [task]", path: "/path/to/pra
 
 ## Rules
 
-1. **Always start with btu-estimator** - Get PM-level tasks first
-2. **Route correctly** - Match repo to architect
-3. **Identify dependencies** - Cross-repo dependencies matter
-4. **Parallelize when possible** - Independent tasks can run together
-5. **Consolidate output** - One unified view for user
+1. **Always start with btu-estimator** - Get tasks with inferred work
+2. **Question FE-only estimates** - If only practice-web, ask "where does data come from?"
+3. **Route correctly** - Match repo to architect
+4. **Identify dependencies** - BE before FE when FE needs new data
+5. **Parallelize when possible** - Independent tasks can run together
+6. **Consolidate output** - One unified view for user
+
+## Red Flags to Catch
+
+| Red Flag | Action |
+|----------|--------|
+| FE displays new data, no BE task | Add BE task for endpoint |
+| "Last N items" without API | Add BE task for query/aggregation |
+| New entity/field displayed | Check if DB migration needed |
+| Real-time requirement | Check if Iris queue needed |
+| Cross-service data | Check if BFF aggregation needed |
