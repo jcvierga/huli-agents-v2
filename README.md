@@ -2,18 +2,71 @@
 
 Specialized AI agents for Huli development workflows.
 
-## Philosophy
-
-**Specialized over generic.** Each agent has ONE job and does it well. Together, they form a multi-agent system that can analyze requirements, infer hidden work, and create comprehensive implementation plans across all repositories.
-
 ## Installation
 
-```bash
-# Add marketplace
-/plugin marketplace add jcvierga/huli-agents-v2
+### Prerequisites
 
-# Install plugin
+- [Claude Code CLI](https://claude.ai/code) installed
+- Claude Pro or Team subscription
+
+### Step 1: Add the Marketplace
+
+```bash
+/plugin marketplace add jcvierga/huli-agents-v2
+```
+
+### Step 2: Install the Plugin
+
+```bash
 /plugin install huli-agents
+```
+
+### Step 3: Verify Installation
+
+```bash
+/agents
+```
+
+You should see the Huli agents listed:
+- `btu-estimator`
+- `orchestrator-huli`
+- `architect-vue2`
+- `architect-go`
+- `architect-php`
+- `architect-bff`
+- `architect-iris`
+- `architect-mysql`
+- `reviewer-integration`
+
+### Step 4: Restart Claude Code
+
+Restart Claude Code to load the new agents.
+
+## Configuration
+
+### For Teams (Recommended)
+
+Add to your repository's `.claude/settings.json` for automatic team access:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "huli-agents": {
+      "source": {
+        "source": "github",
+        "repo": "jcvierga/huli-agents-v2"
+      }
+    }
+  }
+}
+```
+
+### Local Development
+
+For local development, symlink the repo:
+
+```bash
+ln -sf /path/to/huli-agents-v2 ~/.claude/plugins/marketplaces/huli-agents-v2
 ```
 
 ## Agents
@@ -22,18 +75,18 @@ Specialized AI agents for Huli development workflows.
 
 | Agent | Purpose |
 |-------|---------|
-| `btu-estimator` | Analyze requirements, **infer hidden work** (BE, DB, queues), estimate tasks |
+| `btu-estimator` | Analyze requirements, infer hidden work (BE, DB, queues), estimate tasks |
 | `orchestrator-huli` | Coordinate full BTU workflow, delegate to specialists |
 
-### Architects (by repo/technology)
+### Architects
 
-| Agent | Repo/Tech |
-|-------|-----------|
+| Agent | Repo/Technology |
+|-------|-----------------|
 | `architect-vue2` | practice-web (Vue.js 2.7) |
 | `architect-go` | ehr, Go microservices |
 | `architect-php` | practice-api (PHP) |
-| `architect-bff` | hulipractice-api (BFF aggregation) |
-| `architect-iris` | iris (queues, async processing) |
+| `architect-bff` | hulipractice-api (BFF) |
+| `architect-iris` | iris (queues, async) |
 | `architect-mysql` | Database migrations |
 
 ### Reviewers
@@ -44,105 +97,45 @@ Specialized AI agents for Huli development workflows.
 
 ## Usage
 
-### Full BTU Planning (Recommended)
-
-```
-/agents orchestrator-huli
-
-Prompt: Plan BTU-1666: [paste requirements]
-```
-
-The orchestrator will:
-1. Delegate to `btu-estimator` to analyze and infer all work
-2. Route tasks to appropriate architects
-3. Run `reviewer-integration` to validate contracts
-4. Return consolidated plan
-
-### Individual Agents
+### Invoke an Agent
 
 ```bash
-# Just estimate tasks
-/agents btu-estimator
-Prompt: Estimate: [requirements]
-
-# Just plan Vue.js implementation
-/agents architect-vue2
-Prompt: Plan: [practice-web] Create somatometry section - 8pts
+/agents orchestrator-huli
 ```
 
-## Example: BTU-1666
-
-### Input
+Then provide your prompt:
 
 ```
-BTU-1666: Patient Homepage V2 - Somatometría
-
-Requirements:
-- Display vital signs from last 6 consultations with charts
-- Click navigates to source consultation
-- Iterate appointments block (empty state, 3 types)
-- Various UX V1→V2 improvements
+Plan BTU-1666: [paste requirements]
 ```
 
-### Output
+### Use via Task Tool
+
+In your prompts, agents can be invoked via the Task tool:
 
 ```
-BTU-1666: Patient Homepage V2 - Somatometría
-
-Total: 24 pts | 5 tasks | 3 repos
-
-| # | Repo         | Task                                              | Pts |
-|---|--------------|---------------------------------------------------|-----|
-| 1 | db           | Add index for vital signs history query           | 1   |
-| 2 | ehr          | Create vital-signs history endpoint               | 5   |
-| 3 | practice-web | Create somatometry section with charts            | 8   |
-| 4 | practice-web | Iterate appointments block (empty state, 3 types) | 5   |
-| 5 | practice-web | Apply UX V1-V2 improvements                       | 5   |
-
-Inferred Work (Not in Original BTU):
-- Task 1: Index required for query performance
-- Task 2: New endpoint required - FE needs aggregated data
-
-Execution Order:
-├── Task 1 (db) ──► Task 2 (ehr) ──► Task 3 (practice-web)
-├── Task 4 (practice-web) - parallel
-└── Task 5 (practice-web) - parallel
-
-Integration Validated:
-✅ API contract: ehr ↔ practice-web
-✅ All 8 vital sign fields present
-✅ checkupId included for navigation
+Task(subagent_type: "architect-vue2", prompt: "Plan: [task description]")
 ```
-
-### What Happened Behind the Scenes
-
-```
-orchestrator-huli
-       │
-       ├─► btu-estimator
-       │       └─► Inferred: Tasks 1 & 2 (hidden BE work)
-       │
-       ├─► architect-mysql ──► Migration script for index
-       ├─► architect-go ────► Proto + handler for endpoint
-       ├─► architect-vue2 ──► 3 component plans
-       │
-       └─► reviewer-integration
-               └─► Validated contracts between repos
-```
-
-See [docs/MULTI-AGENT.md](docs/MULTI-AGENT.md) for detailed explanation of how agents work together.
-
-## Key Principles
-
-1. **Infer hidden work** - FE data needs = BE endpoint needed
-2. **Specialize by repo** - Each architect knows their codebase patterns
-3. **Review integration** - Validate contracts before implementation
-4. **Consolidate tasks** - Fewer, larger tasks over many small ones
 
 ## Documentation
 
-- [MULTI-AGENT.md](docs/MULTI-AGENT.md) - How multi-agent architecture works
-- [CLAUDE.md](CLAUDE.md) - Agent catalog and workflow
+- [MULTI-AGENT.md](docs/MULTI-AGENT.md) - How the multi-agent architecture works
+- [CLAUDE.md](CLAUDE.md) - Agent catalog and conventions
+
+## Updating
+
+```bash
+/plugin marketplace update
+/plugin
+# Navigate to Installed → huli-agents → Update
+```
+
+## Uninstalling
+
+```bash
+/plugin
+# Navigate to Installed → huli-agents → Uninstall
+```
 
 ## Contributing
 
