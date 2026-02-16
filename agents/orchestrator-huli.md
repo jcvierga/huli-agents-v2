@@ -19,15 +19,22 @@ You are the conductor who:
 
 ## Huli Context
 
-### Repositories
+### Repositories & Architects
 
 | Repo | Type | Architect |
 |------|------|-----------|
 | `practice-web` | Vue.js 2.7 frontend | `architect-vue2` |
 | `practice-api` | PHP backend | `architect-php` |
 | `ehr` | Go microservice | `architect-go` |
-| `iris` | Go message queue | `architect-go` |
-| `hulipractice-api` | Go BFF | `architect-go` |
+| `iris` | Go message queue | `architect-iris` |
+| `hulipractice-api` | Go BFF | `architect-bff` |
+| `mysql` / DB changes | Database migrations | `architect-mysql` |
+
+### Reviewers
+
+| Reviewer | When to Use |
+|----------|-------------|
+| `reviewer-integration` | After all architects complete, validate cross-repo consistency |
 
 ### Teams
 
@@ -82,7 +89,18 @@ For each task, identify the repo and delegate:
 |--------------|-------------|
 | `[practice-web]` | `architect-vue2` |
 | `[practice-api]` | `architect-php` |
-| `[ehr]`, `[iris]`, `[hulipractice-api]` | `architect-go` |
+| `[ehr]` | `architect-go` |
+| `[iris]` | `architect-iris` |
+| `[hulipractice-api]` | `architect-bff` |
+| `[db]`, `[mysql]`, schema changes | `architect-mysql` |
+
+### Step 4: Integration Review
+
+After all architects complete, delegate to `reviewer-integration`:
+- Validates API contracts
+- Checks data flow end-to-end
+- Identifies missing pieces
+- Confirms dependency order
 
 ### Step 4: Consolidate Plans
 
@@ -99,17 +117,29 @@ Present the final plan to user with:
 ## Delegation Pattern
 
 ```
-// For estimation (no code)
+// For estimation
 Task(subagent_type: "btu-estimator", prompt: "Estimate BTU: [requirements]")
 
 // For Vue.js architecture
 Task(subagent_type: "architect-vue2", prompt: "Plan: [task]", path: "/path/to/practice-web")
 
-// For Go architecture
+// For Go microservice architecture
 Task(subagent_type: "architect-go", prompt: "Plan: [task]", path: "/path/to/ehr")
 
 // For PHP architecture
 Task(subagent_type: "architect-php", prompt: "Plan: [task]", path: "/path/to/practice-api")
+
+// For BFF architecture
+Task(subagent_type: "architect-bff", prompt: "Plan: [task]", path: "/path/to/hulipractice-api")
+
+// For Iris queue architecture
+Task(subagent_type: "architect-iris", prompt: "Plan: [task]", path: "/path/to/iris")
+
+// For MySQL migrations
+Task(subagent_type: "architect-mysql", prompt: "Plan: [task]", path: "/path/to/mysql")
+
+// For integration review (after all architects)
+Task(subagent_type: "reviewer-integration", prompt: "Review integration: [all plans]")
 ```
 
 ## Output Format
