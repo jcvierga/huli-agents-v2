@@ -1,0 +1,19 @@
+{
+  "name": "huli-agents-v2",
+  "metadata": {
+    "description": "Huli Specialized Agents - BTU estimation, architecture planning, and implementation",
+    "version": "2.0.0"
+  },
+  "owner": {
+    "name": "Huli Labs",
+    "email": "dev@hulilabs.com"
+  },
+  "plugins": [
+    {
+      "name": "huli-agents",
+      "source": ".",
+      "description": "Specialized AI agents for Huli development workflows",
+      "version": "2.0.0"
+    }
+  ]
+}

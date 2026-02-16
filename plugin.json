@@ -1,0 +1,28 @@
+{
+  "name": "huli-agents",
+  "description": "Specialized AI agents for Huli development workflows - BTU estimation, architecture, and implementation",
+  "version": "2.0.0",
+  "author": {
+    "name": "Huli Labs",
+    "email": "dev@hulilabs.com"
+  },
+  "repository": "https://github.com/hulilabs/huli-agents-v2",
+  "license": "MIT",
+  "keywords": [
+    "huli",
+    "agents",
+    "btu",
+    "estimation",
+    "vue",
+    "golang",
+    "php",
+    "architecture"
+  ],
+  "agents": [
+    "./agents/btu-estimator.md",
+    "./agents/architect-vue2.md",
+    "./agents/architect-go.md",
+    "./agents/architect-php.md",
+    "./agents/orchestrator-huli.md"
+  ]
+}
